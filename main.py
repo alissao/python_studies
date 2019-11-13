@@ -19,25 +19,27 @@ api = tweepy.API(auth)
 searchTerm = input("Digite a hashtag ou palavra-chave que deseja analisar: ")
 noOfSearchTerms = int(input("Quantos tweets com esse parâmetro você deseja analisar? "))
 
-tweets = tweepy.Cursor(api.search, q=searchTerm, lang="pt").items(noOfSearchTerms)
+tweets = tweepy.Cursor(api.search, q=searchTerm, lang="en").items(noOfSearchTerms)
 
 positive = 0
 neutral = 0
 negative = 0
 polarity = 0
+with open('tweets.txt', 'w') as f:
+    for tweet in tweets:
+        # print(tweet.text)
+        f.write(tweet.text + '\n')
 
-for tweet in tweets:
-    # print(tweet.text)
+        analysis = TextBlob(tweet.text)
+        polarity += analysis.sentiment.polarity
 
-    analysis = TextBlob(tweet.text)
-    polarity += analysis.sentiment.polarity
+        if analysis.sentiment.polarity < 0.00:
+            negative += 1
+        elif analysis.sentiment.polarity == 0:
+            neutral += 1
+        elif analysis.sentiment.polarity > 0.00:
+            positive += 1
 
-    if analysis.sentiment.polarity < 0.00:
-        negative += 1
-    elif analysis.sentiment.polarity == 0:
-        neutral += 1
-    elif analysis.sentiment.polarity > 0.00:
-        positive += 1
 
 negative = percentage(negative, noOfSearchTerms)
 neutral = percentage(neutral, noOfSearchTerms)
